@@ -50,7 +50,7 @@ export function Satellite({moving, mobile}: {moving: boolean; mobile:boolean}) {
   const orbit = useRef<THREE.Group>(null);
   const angle = useRef(.06);
   useFrame((_,delta) => {
-    if (moving) angle.current += (mobile ? -1 : 1)*Math.min(delta,.05)*.06*(mobile?3:1);
+    if (moving) angle.current += Math.min(delta,.05)*.06*(mobile?3:1);
     if (!orbit.current) return;
     const a=angle.current;
     const centerY=mobile ? -1.62 : -.75;
