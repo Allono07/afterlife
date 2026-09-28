@@ -1,0 +1,4 @@
+[build]
+  base = "site"
+  command = "npx next build"
+  publish = ".next"
