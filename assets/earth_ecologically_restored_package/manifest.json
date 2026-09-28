@@ -1,0 +1,32 @@
+{
+  "files": [
+    {
+      "file": "README.txt",
+      "bytes": 741
+    },
+    {
+      "file": "earth.glb",
+      "bytes": 2116720
+    },
+    {
+      "file": "earth_cloud_opacity.png",
+      "bytes": 2653082
+    },
+    {
+      "file": "earth_day.jpg",
+      "bytes": 1302798
+    },
+    {
+      "file": "earth_night_emission.jpg",
+      "bytes": 211115
+    },
+    {
+      "file": "earth_normal.jpg",
+      "bytes": 1862771
+    },
+    {
+      "file": "earth_roughness.jpg",
+      "bytes": 692948
+    }
+  ]
+}
