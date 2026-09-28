@@ -62,7 +62,7 @@ export default function Home() {
         </SceneBoundary>
       </div>
       {!ready && !failed && <div className="loading" role="status"><span className="loading-line" />Finding a new perspective</div>}
-      {failed && <div className="scene-fallback" role="status"><p>A little perspective changes everything.</p><small>The 3D scene is unavailable on this device.</small><button onClick={() => window.location.reload()}>Try again</button></div>}
+      {failed && <div className="scene-fallback" role="status"><p>A little perspective changes everything.</p><small>Loading</small><button onClick={() => window.location.reload()}>Try again</button></div>}
       <div className="space-backdrop" aria-hidden="true"/>
       <div className="vignette" aria-hidden="true" />
       <header className={`header reveal${menuOpen ? ' menu-open' : ''}`}>
