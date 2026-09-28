@@ -52,7 +52,8 @@ export default defineConfig(async () => {
 
   return {
     server: {
-      ...(managedLinux ? { host: "0.0.0.0", allowedHosts: ["terminal.local"] } : {}),
+      ...(managedLinux ? { host: "0.0.0.0" } : {}),
+      allowedHosts: [".ngrok-free.dev", ...(managedLinux ? ["terminal.local"] : [])],
       ...(isCodexSeatbeltSandbox ? { watch: { useFsEvents: false, usePolling: true } } : {}),
     },
     plugins: [

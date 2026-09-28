@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PerformanceMonitor, useTexture } from '@react-three/drei';
+import { PerformanceMonitor } from '@react-three/drei';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
@@ -29,7 +29,7 @@ function CameraRig({reduced, moving, mobile, onApproach}: {reduced:boolean; movi
   },[reduced,invalidate,onApproach]);
   useFrame((_,delta)=>{
     const p=reduced ? 0 : progress.current.value;
-    const distance=mobile ? 19 : 14;
+  const distance=mobile ? 22.5 : 14;
     target.set(moving&&!mobile ? cursor.current.x*.12 : 0, .0 + p*.38 + (moving&&!mobile ? -cursor.current.y*.07 : 0),distance-p*(mobile ? 9 : 6.7));
     camera.position.lerp(target, reduced || !moving ? 1 : 1-Math.exp(-delta*3));
     look.set(0, mobile ? -.65 : -.05,0);
@@ -55,8 +55,8 @@ export default function SpaceScene({reduced,paused,onReady,onError,onApproach}:{
   },[]);
   return <Canvas shadows={mobile ? false : 'soft'} camera={{position:[0,0,mobile ? 19 : 14],fov:42,near:.1,far:150}} dpr={dpr} frameloop={moving ? 'always' : 'demand'} gl={{antialias:!mobile,powerPreference:'high-performance',alpha:true}} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.02;gl.domElement.addEventListener('webglcontextlost',onError,{once:true});}} fallback={<Unavailable onError={onError}/>}>
     <PerformanceMonitor onDecline={()=>setDpr(1)} flipflops={2} onFallback={()=>setDpr(1)}/>
-    <ambientLight intensity={.08}/><directionalLight position={[-9,10,5]} intensity={3.4} color="#e4efff" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
-    <hemisphereLight args={['#a2b7cb','#070809',.1]}/>
+    <ambientLight intensity={.2}/><directionalLight position={[-8,10,8]} intensity={3.4} color="#e4efff" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
+    <hemisphereLight args={['#a2b7cb','#070809',.16]}/>
     <Suspense fallback={null}><Earth moving={moving} mobile={mobile}/><Satellite moving={moving} mobile={mobile}/><Foreground mobile={mobile}/><SeatedBoy mobile={mobile}/><Loaded onReady={onReady}/></Suspense>
     <CameraRig reduced={reduced} moving={moving} mobile={mobile} onApproach={onApproach}/>
   </Canvas>;

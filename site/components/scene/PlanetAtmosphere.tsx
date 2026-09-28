@@ -262,6 +262,8 @@ export function AtmosphereShell({
   }, [material, skyTint, horizonTint]);
 
   useEffect(() => {
+    // ShaderMaterial uniforms are mutable Three.js GPU state synchronized from component props.
+    // eslint-disable-next-line react-hooks/immutability
     material.uniforms.uIntensity.value = intensity;
     material.uniforms.uHorizonPower.value = horizonPower;
     material.uniforms.uRayleighStrength.value = rayleighStrength;
@@ -353,6 +355,8 @@ export function CloudShell({
   );
 
   useEffect(() => {
+    // ShaderMaterial uniforms are mutable Three.js GPU state synchronized from component props.
+    // eslint-disable-next-line react-hooks/immutability
     material.uniforms.uCloudMap.value = cloudTexture;
     material.uniforms.uTint.value.set(tint);
     material.uniforms.uOpacity.value = opacity;
