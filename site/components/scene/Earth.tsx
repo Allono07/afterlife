@@ -41,7 +41,9 @@ function Atmosphere() {
       vec3 color=mix(vec3(.025,.17,.28),vec3(.25,.65,1.),daylight);
       float sunrise=smoothstep(-.35,-.08,sunDot)*(1.-smoothstep(-.08,.32,sunDot));
       color=mix(color,vec3(1.,.36,.16),sunrise*.38);
-      gl_FragColor=vec4(color,edge*(.13+daylight*.85));}`
+      float sunRim=pow(max(sunDot,0.),4.)*edge;
+      color+=vec3(1.,.83,.55)*sunRim*.65;
+      gl_FragColor=vec4(color,edge*(.10+daylight*.9));}`
   }),[]);
   return <mesh material={material}><sphereGeometry args={[RADIUS*1.012,96,64]}/></mesh>;
 }

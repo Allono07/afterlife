@@ -4,7 +4,8 @@ import { PerformanceMonitor } from '@react-three/drei';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
-import { Earth } from './Earth';
+import { Earth, SUN } from './Earth';
+import { Sunlight } from './Sunlight';
 import { Satellite } from './Satellite';
 import { Foreground, SeatedBoy } from './Foreground';
 
@@ -91,9 +92,9 @@ export default function SpaceScene({reduced,paused,onReady,onError,onApproach}:{
     {moving && <PerformanceMonitor ms={300} iterations={10} bounds={()=>[45,58]}
       onDecline={()=>setDpr(value=>Math.min(window.devicePixelRatio,Math.max(1.5,value-.25)))}
       onIncline={()=>setDpr(value=>Math.min(window.devicePixelRatio,2,value+.25))}/>}
-    <ambientLight intensity={.2}/><directionalLight position={[-8,10,8]} intensity={3.4} color="#e4efff" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
+    <ambientLight intensity={.2}/><directionalLight position={[SUN.x*18,SUN.y*18,SUN.z*18]} intensity={3.8} color="#fff2dc" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
     <hemisphereLight args={['#a2b7cb','#070809',.16]}/>
-    <Suspense fallback={null}><Earth moving={moving} mobile={mobile}/><Satellite moving={moving} mobile={mobile}/><Foreground mobile={mobile}/><SeatedBoy mobile={mobile}/><Loaded onReady={onReady}/></Suspense>
+    <Suspense fallback={null}><Sunlight mobile={mobile}/><Earth moving={moving} mobile={mobile}/><Satellite moving={moving} mobile={mobile}/><Foreground mobile={mobile}/><SeatedBoy mobile={mobile}/><Loaded onReady={onReady}/></Suspense>
     <CameraRig reduced={reduced} moving={moving} mobile={mobile} onApproach={onApproach}/>
   </Canvas>;
 }
