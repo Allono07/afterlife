@@ -3,7 +3,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import gsap from 'gsap';
 import { ArrowUpRight, Menu, Pause, Play, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import Link from 'next/link';
 
 const SpaceScene = lazy(() => import('@/components/scene/SpaceScene'));
 const subscribeHydration = () => () => {};
@@ -26,7 +26,6 @@ export default function Home() {
   const [sceneReady, setSceneReady] = useState(false);
   const [pageReady, setPageReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [panel, setPanel] = useState<'Work' | 'About' | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const ready = sceneReady && pageReady && !failed;
   const handleReady = useCallback(() => setSceneReady(true), []);
@@ -82,7 +81,7 @@ export default function Home() {
       {ready && <a href="#main" className="skip-link">Skip to main content</a>}
       <div className={`scene-wrap ${ready ? 'is-ready' : ''}`} aria-hidden="true">
         <SceneBoundary onError={handleError}>
-          {mounted && <Suspense fallback={null}><SpaceScene reduced={reduced} paused={paused || panel !== null} onApproach={setApproached} onReady={handleReady} onError={handleError} /></Suspense>}
+          {mounted && <Suspense fallback={null}><SpaceScene reduced={reduced} paused={paused} onApproach={setApproached} onReady={handleReady} onError={handleError} /></Suspense>}
         </SceneBoundary>
       </div>
       <div className={`loading-screen${ready ? ' is-dismissed' : ''}`} aria-hidden={ready} inert={ready}>
@@ -108,10 +107,9 @@ export default function Home() {
           {menuOpen ? <X size={19} strokeWidth={1.5}/> : <Menu size={20} strokeWidth={1.5}/>}
         </button>
         <nav id="primary-navigation" aria-label="Main navigation">
-          <button onClick={() => {setMenuOpen(false);setPanel('Work');}}>Work</button>
-          <button onClick={() => {setMenuOpen(false);approach();}}>Ideas</button>
-          <button onClick={() => {setMenuOpen(false);setPanel('About');}}>About</button>
-          <a href="mailto:allono.at@gmail.com" onClick={() => setMenuOpen(false)}>Contact <ArrowUpRight size={14} strokeWidth={1.5}/></a>
+          <Link className="home-nav-link" href="/lab" onClick={() => setMenuOpen(false)}>What we do</Link>
+          <Link className="home-nav-link" href="/values" onClick={() => setMenuOpen(false)}>Values</Link>
+          <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact <ArrowUpRight size={14} strokeWidth={1.5}/></Link>
         </nav>
       </header>
       <main id="main" tabIndex={-1} inert={!ready}>
@@ -120,7 +118,7 @@ export default function Home() {
           <p className="eyebrow reveal">IDEAS FOR A MORE HUMAN TOMORROW</p>
           <button className="hero-explore reveal" onClick={approach}>EXPLORE <ArrowUpRight size={17} strokeWidth={1.5}/></button>
         </div>
-        <div className="journey-end" aria-hidden={!approached} inert={!approached}><p>A little distance.<br/><em>A different perspective.</em></p><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon <ArrowUpRight size={14}/></button></div>
+        <div className="journey-end" aria-hidden={!approached} inert={!approached}><p>Two worlds.<br/><em>Where will you go?</em></p><div className="home-destinations"><Link href="/lab/software">Software &amp; AI Solutions <ArrowUpRight size={17}/></Link><Link href="/lab/ads">Media Content Creation <ArrowUpRight size={17}/></Link></div><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon <ArrowUpRight size={14}/></button></div>
       </main>
       <footer className="footer reveal" inert={!ready}>
         <button className="motion-button" onClick={() => setPaused(v => !v)} disabled={reduced} aria-label={reduced ? 'Motion reduced by device preference' : paused ? 'Play scene motion' : 'Pause scene motion'} aria-pressed={paused || reduced}>
@@ -128,15 +126,7 @@ export default function Home() {
         </button>
       </footer>
       <div className="scroll-track" aria-hidden="true" />
-      <Dialog open={panel !== null} onOpenChange={open => !open && setPanel(null)}>
-        <DialogContent className="info-panel">
-          <span className="panel-kicker">AFTERLIFE THEORY LABS / {panel?.toUpperCase()}</span>
-          <DialogTitle>{panel === 'Work' ? 'Ideas beyond the expected.' : 'A different perspective.'}</DialogTitle>
-          <DialogDescription>{panel === 'Work' ? 'Explorations at the meeting point of human curiosity, technology, and the natural world.' : 'Afterlife Theory Labs explores what lies beyond binary thinking and silicon. A space for asking bigger questions—and imagining what comes next.'}</DialogDescription>
-          {panel === 'Work' && <button className="panel-project" onClick={() => {setPanel(null); approach();}}><span><small>EXPERIMENT 001</small>The overview effect</span><ArrowUpRight size={22}/></button>}
-          {panel === 'About' && <><p className="panel-signature">Beyond Binary &amp; Silicon.</p><p className="credits">Earth maps: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Solar System Scope</a>, CC BY 4.0. Lunar material: <a href="https://polyhaven.com/a/moon_01" target="_blank" rel="noreferrer">Poly Haven</a>, CC0. Color and resolution adapted for this scene.</p></>}
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./worlds.css";
 
 export const metadata: Metadata = {
   title: "Afterlife Theory Labs — Beyond Binary & Silicon",
