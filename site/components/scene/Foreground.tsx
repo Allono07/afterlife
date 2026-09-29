@@ -52,8 +52,5 @@ export function SeatedBoy({mobile}: {mobile:boolean}) {
       <planeGeometry args={[size,size]}/>
       <meshBasicMaterial map={texture} transparent alphaTest={.025} toneMapped={false} depthWrite={false}/>
     </mesh>
-    <mesh position={[0,-.075,.04]} scale={[.62,.075,1]} renderOrder={3}>
-      <circleGeometry args={[1,48]}/><meshBasicMaterial color="#010203" transparent opacity={.8} depthWrite={false}/>
-    </mesh>
   </group>;
 }
