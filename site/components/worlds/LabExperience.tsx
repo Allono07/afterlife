@@ -45,6 +45,6 @@ export function LabExperience({kind}:{kind:keyof typeof labs}) {
         <Link className="world-action" href={`/contact?interest=${encodeURIComponent(service.label)}`}>Let’s build this together <ArrowUpRight size={18}/></Link>
       </div>
     </section>
-    <Link className="world-switch" href={kind==='software'?'/lab/ads':'/lab/software'}>Explore {kind==='software'?'AI Ad Creation':'Software & AI Solutions'} <ArrowRight size={16}/></Link>
+    <Link className="world-switch" href={kind==='software'?'/lab/ads':'/lab/software'}>Explore {kind==='software'?'Media Creation':'Software & AI Solutions'} <ArrowRight size={16}/></Link>
   </WorldShell>;
 }

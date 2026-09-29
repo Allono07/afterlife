@@ -118,7 +118,7 @@ export default function Home() {
           <p className="eyebrow reveal">IDEAS FOR A MORE HUMAN TOMORROW</p>
           <button className="hero-explore reveal" onClick={approach}>EXPLORE <ArrowUpRight size={17} strokeWidth={1.5}/></button>
         </div>
-        <div className="journey-end" aria-hidden={!approached} inert={!approached}><p>Two worlds.<br/><em>Where will you go?</em></p><div className="home-destinations"><Link href="/lab/software">Software &amp; AI Solutions <ArrowUpRight size={17}/></Link><Link href="/lab/ads">Media Content Creation <ArrowUpRight size={17}/></Link></div><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon <ArrowUpRight size={14}/></button></div>
+        <div className="journey-end" aria-hidden={!approached} inert={!approached}><p>Two worlds.<br/><em>Where will you go?</em></p><div className="home-destinations"><Link href="/lab/software">Software &amp; AI Solutions <ArrowUpRight size={17}/></Link><Link href="/lab/ads">Media Content Creation <ArrowUpRight size={17}/></Link></div><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon </button></div>
       </main>
       <footer className="footer reveal" inert={!ready}>
         <button className="motion-button" onClick={() => setPaused(v => !v)} disabled={reduced} aria-label={reduced ? 'Motion reduced by device preference' : paused ? 'Play scene motion' : 'Pause scene motion'} aria-pressed={paused || reduced}>
