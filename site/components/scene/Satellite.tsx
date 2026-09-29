@@ -2,17 +2,22 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { batchStaticModel } from './batchStaticModel';
 
 export function Satellite({moving, mobile}: {moving: boolean; mobile:boolean}) {
   const {scene} = useGLTF('/assets/satellite.glb');
   const model = useMemo(() => {
     const copy=scene.clone(true);
+    const materialCache=new Map<THREE.Material,THREE.Material>();
     copy.traverse(o=>{
       if(!(o instanceof THREE.Mesh))return;
       o.geometry=o.geometry.clone();
       o.geometry.computeVertexNormals();
       const tune=(source:THREE.Material)=>{
+        const cached=materialCache.get(source);
+        if(cached)return cached;
         const material=source.clone();
+        materialCache.set(source,material);
         if(material instanceof THREE.MeshStandardMaterial){
           material.envMapIntensity=1.15;
           if(material.name==='Photovoltaic Array'){
@@ -37,8 +42,11 @@ export function Satellite({moving, mobile}: {moving: boolean; mobile:boolean}) {
       };
       o.material=Array.isArray(o.material)?o.material.map(tune):tune(o.material);
     });
-    return copy;
-  },[scene]);
+    if(!mobile)return copy;
+    const batched=batchStaticModel(copy);
+    copy.traverse(o=>{if(o instanceof THREE.Mesh)o.geometry.dispose();});
+    return batched;
+  },[scene,mobile]);
   useEffect(()=>()=>{
     model.traverse(o=>{
       if(o instanceof THREE.Mesh){

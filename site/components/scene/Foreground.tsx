@@ -5,16 +5,16 @@ import * as THREE from 'three';
 /** Supplied Z-up volcanic terrain. Keep the original GLB and its PBR layers. */
 export function Foreground({mobile}: {mobile: boolean}) {
   const {scene} = useGLTF('/assets/foreground_planet.glb');
-  const loadedMaps=useTexture([`albedo`,`normal`,`arm`].map(n=>`/assets/lunar/${n}${mobile?'-mobile':''}.webp`));
+  const loadedMaps=useTexture([`albedo`,`normal`,`arm`].map(n=>`/assets/lunar/${n}${mobile && n!=='albedo'?'-mobile':''}.webp`));
   const maps=useMemo(()=>loadedMaps.map((source,index)=>{
     const texture=source.clone();
     if(index===0)texture.colorSpace=THREE.SRGBColorSpace;
     texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
     texture.repeat.set(5,5);
-    texture.anisotropy=mobile?4:8;
+    texture.anisotropy=8;
     texture.flipY=false;
     return texture;
-  }) as [THREE.Texture,THREE.Texture,THREE.Texture],[loadedMaps,mobile]);
+  }) as [THREE.Texture,THREE.Texture,THREE.Texture],[loadedMaps]);
   const terrain = useMemo(() => {
     const copy=scene.clone(true);
     copy.traverse(o => {
@@ -65,7 +65,7 @@ export function Foreground({mobile}: {mobile: boolean}) {
           material.map=maps[0];material.normalMap=maps[1];material.roughnessMap=maps[2];material.aoMap=maps[2];material.aoMapIntensity=.8;material.metalnessMap=null;
           material.normalScale.set(rocky?1.35:2.35,rocky?1.35:2.35);
         }
-        if(material.map)material.map.anisotropy=mobile?2:8;
+        if(material.map)material.map.anisotropy=8;
         return material;
       });
       o.material=Array.isArray(o.material)?tuned:tuned[0];
@@ -73,7 +73,7 @@ export function Foreground({mobile}: {mobile: boolean}) {
     return copy;
   },[scene,mobile,maps]);
   useEffect(()=>()=>{
-    terrain.traverse(o=>{if(o instanceof THREE.Mesh)(o.material as THREE.Material).dispose();});
+    terrain.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const material of Array.isArray(o.material)?o.material:[o.material])material.dispose();}});
     maps.forEach(texture=>texture.dispose());
   },[terrain,maps]);
   return <group position={[0,mobile ? -6.3 : -3.38,mobile ? 5.9 : 3]}>
@@ -83,7 +83,7 @@ export function Foreground({mobile}: {mobile: boolean}) {
 
 /** A rear-view photographic character plate keeps the small hero figure natural. */
 export function SeatedBoy({mobile}: {mobile:boolean}) {
-  const loadedTexture=useTexture(mobile?'/assets/boy-cinematic-mobile.webp':'/assets/boy-cinematic.webp');
+  const loadedTexture=useTexture('/assets/boy-cinematic.webp');
   const texture=useMemo(()=>{
     const copy=loadedTexture.clone();
     copy.colorSpace=THREE.SRGBColorSpace;

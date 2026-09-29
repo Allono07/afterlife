@@ -48,22 +48,22 @@ function Atmosphere() {
 
 export function Earth({moving,mobile}:{moving:boolean;mobile:boolean}) {
   const surface=useRef<THREE.Mesh>(null), clouds=useRef<THREE.Mesh>(null);
-  const loadedTextures=useTexture(['day','clouds','night'].map(n=>`/assets/earth-v2/${n}${mobile?'-mobile':''}.webp`));
+  const loadedTextures=useTexture(['day','clouds','night'].map(n=>`/assets/earth-v2/${n}${mobile && n!=='day'?'-mobile':''}.webp`));
   const [day,cloud,night]=useMemo(()=>loadedTextures.map((source,index)=>{
     const texture=source.clone();
     if(index!==1)texture.colorSpace=THREE.SRGBColorSpace;
-    texture.anisotropy=mobile?2:8;
+    texture.anisotropy=8;
     return texture;
-  }) as [THREE.Texture,THREE.Texture,THREE.Texture],[loadedTextures,mobile]);
+  }) as [THREE.Texture,THREE.Texture,THREE.Texture],[loadedTextures]);
   useEffect(()=>()=>{day.dispose();cloud.dispose();night.dispose();},[day,cloud,night]);
   useFrame((_,delta)=>{if(!moving)return;const step=Math.min(delta,.05)*(mobile?3:1);if(surface.current)surface.current.rotation.y+=step*.019;if(clouds.current)clouds.current.rotation.y+=step*.024;});
   return <group position={[0,mobile ? -1.62 : -.75,0]} rotation={[.16,0,.12]}>
     <mesh ref={surface} rotation={[0,ROTATION,0]}>
-      <sphereGeometry args={[RADIUS,mobile?80:144,mobile?56:96]}/>
+      <sphereGeometry args={[RADIUS,mobile?112:144,mobile?72:96]}/>
       <meshStandardMaterial onBeforeCompile={surfaceShader} map={day} emissiveMap={night} emissive="#e6cda5" emissiveIntensity={.7} roughness={.8} metalness={.05}/>
     </mesh>
     <mesh ref={clouds} rotation={[0,ROTATION+.025,0]}>
-      <sphereGeometry args={[RADIUS*1.004,mobile?80:144,mobile?56:96]}/>
+      <sphereGeometry args={[RADIUS*1.004,mobile?112:144,mobile?72:96]}/>
       <meshStandardMaterial color="#f6fafc" alphaMap={cloud} transparent opacity={.84} depthWrite={false} roughness={1}/>
     </mesh>
     <Atmosphere/>
