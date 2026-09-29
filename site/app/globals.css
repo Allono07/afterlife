@@ -36,7 +36,7 @@ button:focus-visible, a:focus-visible { outline: 1px solid #b5d3a7; outline-offs
 button { border: 0; background: none; }
 ::selection { background: #adc69c; color: #050708; }
 .experience { position: relative; min-height: 230svh; }
-.scene-wrap { position: fixed; inset: 0; opacity: 0; transition: opacity 2s ease; z-index: 1; }
+.scene-wrap { position: fixed; inset: 0; opacity: 0; z-index: 1; }
 .scene-wrap.is-ready { opacity: 1; }
 .scene-wrap canvas { display: block; touch-action: pan-y; }
 .space-backdrop {
@@ -199,37 +199,28 @@ h1 span { color: #79b37a; }
   border-bottom: 1px solid #ffffff55;
   padding: 10px 0;
 }
-.loading {
+.experience[data-loading="true"] :is(.header, main, .footer, .space-backdrop, .vignette) { visibility: hidden; }
+.loading-screen {
   position: fixed;
-  top: 53%;
-  width: 100%;
-  text-align: center;
-  font-size: 11px;
-  letter-spacing: .1em;
-  color: #a1ab9b;
-  z-index: 3;
-}
-.loading-line {
-  display: block;
-  width: 40px;
-  height: 1px;
-  background: #a1ab9b;
-  margin: 0 auto 15px;
-  animation: loading 2s ease infinite;
-}
-.scene-fallback {
-  position: fixed;
-  inset: 38% 10% 15%;
-  z-index: 3;
+  inset: 0;
+  z-index: 90;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  color: #aab6a7;
+  gap: 24px;
+  padding: 24px;
+  background: #030506;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .35s ease, visibility .35s;
 }
-.scene-fallback p { font-size: 24px; }
-.scene-fallback button { margin-top: 18px; text-decoration: underline; }
+.loading-screen.is-dismissed { opacity: 0; visibility: hidden; pointer-events: none; }
+.loading-wordmark { font-family: var(--display-font); font-size: clamp(17px, 4vw, 24px); font-weight: 800; letter-spacing: -.055em; text-align: center; }
+.loading-wordmark em { color: var(--accent); font-style: normal; }
+.loading-caption { color: #a1ab9b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; text-align: center; }
+.loading-line { display: block; width: 64px; height: 1px; background: var(--accent); animation: loading 2s ease infinite; }
+.loading-retry { padding: 14px 24px; border: 1px solid #ffffff70; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 .info-panel {
   background: #0b100e !important;
   border: 1px solid #adc69c33 !important;

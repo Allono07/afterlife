@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { addAfterEffect, Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -38,9 +38,35 @@ function CameraRig({reduced, moving, mobile, onApproach}: {reduced:boolean; movi
   return null;
 }
 
-function Loaded({onReady}: {onReady:()=>void}) {useEffect(()=>onReady(),[onReady]); return null;}
+function Loaded({onReady}: {onReady:()=>void}) {
+  const rendered = useRef(false);
+  const { gl, invalidate } = useThree();
+  useFrame(() => { rendered.current = true; });
+  useEffect(() => {
+    let reported = false;
+    // This component commits only after the shared asset Suspense resolves.
+    // After-effects run after Three has rendered, including demand-mode frames.
+    const unsubscribe = addAfterEffect(() => {
+      if (reported || !rendered.current || gl.getContext().isContextLost()) return;
+      reported = true;
+      onReady();
+    });
+    invalidate();
+    return unsubscribe;
+  }, [gl, invalidate, onReady]);
+  return null;
+}
 
-function Unavailable({onError}:{onError:()=>void}) {useEffect(()=>onError(),[onError]);return null;}
+function ContextEvents({onError}: {onError:()=>void}) {
+  const { gl } = useThree();
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const lost = () => onError();
+    canvas.addEventListener('webglcontextlost', lost);
+    return () => canvas.removeEventListener('webglcontextlost', lost);
+  }, [gl, onError]);
+  return null;
+}
 
 export default function SpaceScene({reduced,paused,onReady,onError,onApproach}:{reduced:boolean;paused:boolean;onReady:()=>void;onError:()=>void;onApproach:(value:boolean)=>void}) {
   const [mobile,setMobile]=useState(()=>window.innerWidth<700);
@@ -53,7 +79,8 @@ export default function SpaceScene({reduced,paused,onReady,onError,onApproach}:{
     window.addEventListener('resize',resize);document.addEventListener('visibilitychange',visibility);
     return ()=>{window.removeEventListener('resize',resize);document.removeEventListener('visibilitychange',visibility);};
   },[]);
-  return <Canvas shadows={mobile ? false : 'soft'} camera={{position:[0,0,mobile ? 19 : 14],fov:42,near:.1,far:150}} dpr={dpr} frameloop={moving ? 'always' : 'demand'} gl={{antialias:!mobile,powerPreference:'high-performance',alpha:true}} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.02;gl.domElement.addEventListener('webglcontextlost',onError,{once:true});}} fallback={<Unavailable onError={onError}/>}>
+  return <Canvas shadows={mobile ? false : 'soft'} camera={{position:[0,0,mobile ? 22.5 : 14],fov:42,near:.1,far:150}} dpr={dpr} frameloop={moving ? 'always' : 'demand'} gl={{antialias:!mobile,powerPreference:'high-performance',alpha:true}} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.02;}} fallback={<span>This scene requires WebGL.</span>}>
+    <ContextEvents onError={onError}/>
     <PerformanceMonitor onDecline={()=>setDpr(1)} flipflops={2} onFallback={()=>setDpr(1)}/>
     <ambientLight intensity={.2}/><directionalLight position={[-8,10,8]} intensity={3.4} color="#e4efff" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
     <hemisphereLight args={['#a2b7cb','#070809',.16]}/>
