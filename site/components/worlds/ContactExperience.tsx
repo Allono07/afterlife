@@ -10,13 +10,18 @@ export function ContactExperience(){
   const interestRef=useRef<HTMLSelectElement>(null);
   const formRef=useRef<HTMLFormElement>(null);
   const reviewTitle=useRef<HTMLHeadingElement>(null);
+  const successTitle=useRef<HTMLHeadingElement>(null);
   const [review,setReview]=useState<Enquiry|null>(null);
   const [copyStatus,setCopyStatus]=useState('');
+  const [submitted,setSubmitted]=useState(false);
+  const [isSubmitting,setIsSubmitting]=useState(false);
+  const [submitError,setSubmitError]=useState('');
   useEffect(()=>{
     const queryInterest=new URLSearchParams(window.location.search).get('interest');
     if(queryInterest&&interests.includes(queryInterest)&&interestRef.current)interestRef.current.value=queryInterest;
   },[]);
   useEffect(()=>{if(review)reviewTitle.current?.focus();},[review]);
+  useEffect(()=>{if(submitted)successTitle.current?.focus();},[submitted]);
   function reviewEnquiry(event:FormEvent<HTMLFormElement>){
     event.preventDefault();const data=new FormData(event.currentTarget);
     setReview({name:String(data.get('name')).trim(),email:String(data.get('email')).trim(),interest:String(data.get('interest')).trim(),message:String(data.get('message')).trim()});
@@ -26,6 +31,25 @@ export function ContactExperience(){
     if(!review)return;
     try{await navigator.clipboard.writeText(`Name: ${review.name}\nEmail: ${review.email}\nInterested in: ${review.interest}\n\n${review.message}`);setCopyStatus('Enquiry copied.');}
     catch{setCopyStatus('Copy is unavailable. You can select and copy the preview text.');}
+  }
+  async function sendEnquiry(){
+    const form=formRef.current;
+    if(!form||isSubmitting)return;
+    const payload=new URLSearchParams();
+    new FormData(form).forEach((value,key)=>{
+      if(typeof value==='string')payload.append(key,value);
+    });
+    setIsSubmitting(true);
+    setSubmitError('');
+    try{
+      const response=await fetch(window.location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:payload.toString()});
+      if(!response.ok)throw new Error('Form submission failed.');
+      setSubmitted(true);
+    }catch{
+      setSubmitError('We couldn’t send your enquiry. Please try again.');
+    }finally{
+      setIsSubmitting(false);
+    }
   }
   return <WorldShell image="adlab" label="Start a conversation">
     <div className="contact-layout">
@@ -40,7 +64,7 @@ export function ContactExperience(){
           <button type="submit" className="world-action">Review enquiry <ArrowUpRight size={18}/></button>
           <p className="contact-notice">Review your enquiry before sending it.</p>
         </form>
-        {review&&<div className="enquiry-review"><p className="world-kicker">ENQUIRY PREVIEW</p><h2 ref={reviewTitle} tabIndex={-1}>Here’s your starting point.</h2><dl><dt>Name</dt><dd>{review.name}</dd><dt>Email</dt><dd>{review.email}</dd><dt>Interested in</dt><dd>{review.interest}</dd><dt>Your idea</dt><dd className="enquiry-message">{review.message}</dd></dl><button type="button" className="world-action" onClick={()=>formRef.current?.submit()}>Send enquiry <ArrowUpRight size={18}/></button><button type="button" className="world-action" onClick={copy}>{copyStatus==='Enquiry copied.'?<Check size={16}/>:<Copy size={16}/>} Copy enquiry</button><p className="contact-notice" role="status">{copyStatus||'Your enquiry is ready to send.'}</p><button className="edit-enquiry" onClick={()=>setReview(null)}><ArrowLeft size={14}/> Edit your enquiry</button></div>}
+        {submitted?<div className="enquiry-success" role="status" aria-live="polite"><p className="world-kicker">ENQUIRY SENT</p><h2 ref={successTitle} tabIndex={-1}>Thanks for getting in touch.</h2><p>We’ve received your enquiry and will be in touch soon.</p></div>:review&&<div className="enquiry-review"><p className="world-kicker">ENQUIRY PREVIEW</p><h2 ref={reviewTitle} tabIndex={-1}>Here’s your starting point.</h2><dl><dt>Name</dt><dd>{review.name}</dd><dt>Email</dt><dd>{review.email}</dd><dt>Interested in</dt><dd>{review.interest}</dd><dt>Your idea</dt><dd className="enquiry-message">{review.message}</dd></dl><button type="button" className="world-action" onClick={sendEnquiry} disabled={isSubmitting}>{isSubmitting?'Sending enquiry…':'Send enquiry'} <ArrowUpRight size={18}/></button><button type="button" className="world-action" onClick={copy} disabled={isSubmitting}>{copyStatus==='Enquiry copied.'?<Check size={16}/>:<Copy size={16}/>} Copy enquiry</button><p className="contact-notice" role={submitError?'alert':'status'}>{submitError||copyStatus||'Your enquiry is ready to send.'}</p><button className="edit-enquiry" onClick={()=>setReview(null)} disabled={isSubmitting}><ArrowLeft size={14}/> Edit your enquiry</button></div>}
       </section>
     </div>
   </WorldShell>;
