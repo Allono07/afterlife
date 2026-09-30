@@ -62,10 +62,62 @@ export function ContactExperience(){
           <label>What would you like to create?<select ref={interestRef} name="interest" required defaultValue=""><option value="" disabled>Choose a starting point</option><optgroup label="Software & AI Solutions">{labs.software.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><optgroup label="Media Content Creation">{labs.ads.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><option>Something else / Let’s explore</option></select></label>
           <label>A little about your idea<textarea name="message" required minLength={10} maxLength={5000} rows={4} placeholder="What are you hoping to build, change, or create?"/></label>
           <button type="submit" className="world-action">Review enquiry <ArrowUpRight size={18}/></button>
-          <p className="contact-notice">Review your enquiry before sending it.</p>
+          {/* <p className="contact-notice">Review your enquiry before sending it.</p> */}
         </form>
-        {submitted?<div className="enquiry-success" role="status" aria-live="polite"><p className="world-kicker">ENQUIRY SENT</p><h2 ref={successTitle} tabIndex={-1}>Thanks for getting in touch.</h2><p>We’ve received your enquiry and will be in touch soon.</p></div>:review&&<div className="enquiry-review"><p className="world-kicker">ENQUIRY PREVIEW</p><h2 ref={reviewTitle} tabIndex={-1}>Here’s your starting point.</h2><dl><dt>Name</dt><dd>{review.name}</dd><dt>Email</dt><dd>{review.email}</dd><dt>Interested in</dt><dd>{review.interest}</dd><dt>Your idea</dt><dd className="enquiry-message">{review.message}</dd></dl><button type="button" className="world-action" onClick={sendEnquiry} disabled={isSubmitting}>{isSubmitting?'Sending enquiry…':'Send enquiry'} <ArrowUpRight size={18}/></button><button type="button" className="world-action" onClick={copy} disabled={isSubmitting}>{copyStatus==='Enquiry copied.'?<Check size={16}/>:<Copy size={16}/>} Copy enquiry</button><p className="contact-notice" role={submitError?'alert':'status'}>{submitError||copyStatus||'Your enquiry is ready to send.'}</p><button className="edit-enquiry" onClick={()=>setReview(null)} disabled={isSubmitting}><ArrowLeft size={14}/> Edit your enquiry</button></div>}
-      </section>
+{submitted ? (
+  <div className="enquiry-success" role="status" aria-live="polite">
+    <p className="world-kicker">ENQUIRY SENT</p>
+    <h2 ref={successTitle} tabIndex={-1}>
+      Thanks for getting in touch.
+    </h2>
+    <p>We’ve received your enquiry and will be in touch soon.</p>
+  </div>
+) : (
+  review && (
+    <div className="enquiry-review">
+      <p className="world-kicker">ENQUIRY PREVIEW</p>
+      <h2 ref={reviewTitle} tabIndex={-1}>
+        Here’s your starting point.
+      </h2>
+
+      <dl>
+        <dt>Name</dt>
+        <dd>{review.name}</dd>
+
+        <dt>Email</dt>
+        <dd>{review.email}</dd>
+
+        <dt>Interested in</dt>
+        <dd>{review.interest}</dd>
+
+        <dt>Your idea</dt>
+        <dd className="enquiry-message">{review.message}</dd>
+      </dl>
+
+      <button
+        type="button"
+        className="world-action"
+        onClick={sendEnquiry}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Sending enquiry…' : 'Send enquiry'}{' '}
+        <ArrowUpRight size={18} />
+      </button>
+
+      <p className="contact-notice" role={submitError ? 'alert' : 'status'}>
+        {submitError || 'Your enquiry is ready to send.'}
+      </p>
+
+      <button
+        className="edit-enquiry"
+        onClick={() => setReview(null)}
+        disabled={isSubmitting}
+      >
+        <ArrowLeft size={14} /> Edit your enquiry
+      </button>
+    </div>
+  )
+)}      </section>
     </div>
   </WorldShell>;
 }
