@@ -4,7 +4,7 @@ import "./worlds.css";
 
 export const metadata: Metadata = {
   title: "Afterlife Theory Labs — Beyond Binary & Silicon",
-  description: "A different frame of reference. Explore a world beyond binary thinking and silicon with Afterlife Theory Labs.",
+  description: "A human-centered design and engineering studio building AI-enabled software and media for a more human tomorrow.",
   other: {
     "codex-preview": "development",
   },
