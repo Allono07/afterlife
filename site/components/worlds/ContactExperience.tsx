@@ -51,7 +51,7 @@ export function ContactExperience(){
       setIsSubmitting(false);
     }
   }
-  return <WorldShell image="adlab" label="Start a conversation">
+  return <WorldShell image="@contact.webp" label="Start a conversation">
     <div className="contact-layout">
       <div className="contact-intro"><p className="world-kicker">CONTACT / EVERY IDEA STARTS SOMEWHERE</p><h1>Something<br/>on your<br/><em>horizon?</em></h1><p>A half-formed idea, a business challenge, or a story waiting to be told. We’d love to hear it.</p></div>
       <section className="contact-panel" aria-label="Project enquiry">

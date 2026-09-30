@@ -10,13 +10,17 @@ import {ArrowLeft, ArrowUpRight} from 'lucide-react';
 export function WorldShell({children,image='softwarelab',label,position='50%'}:{children:ReactNode;image?:string;label:string;position?:string}) {
   const [menu,setMenu]=useState(false);
   const pathname=usePathname();
+  const isExplicitAsset=image.startsWith('@');
+  const imageName=isExplicitAsset ? image.slice(1) : image.includes('.') ? image : `${image}.webp`;
+  const imageSrc = isExplicitAsset ? `/assets/${imageName}` : `/assets/worlds/${imageName}`;
+  const imageClass=image.replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'') || 'softwarelab';
   useEffect(()=>{
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')setMenu(false);};
     window.addEventListener('keydown',escape);
     return()=>window.removeEventListener('keydown',escape);
   },[]);
-  return <div className={`world world-${image}`} style={{'--landscape-position':position} as CSSProperties}>
-    <div className="world-scenery" aria-hidden="true"><Image src={`/assets/worlds/${image}.webp`} alt="" fill sizes="100vw" priority unoptimized className="world-landscape"/><div className="world-wash"/></div>
+  return <div className={`world world-${imageClass}`} style={{'--landscape-position':position} as CSSProperties}>
+    <div className="world-scenery" aria-hidden="true"><Image src={imageSrc} alt="" fill sizes="100vw" priority unoptimized className="world-landscape"/><div className="world-wash"/></div>
     <div className="world-arrival" aria-hidden="true"/>
     <a className="skip-link" href="#destination">Skip to content</a>
     <header className="world-header">

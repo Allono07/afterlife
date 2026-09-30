@@ -7,7 +7,7 @@ import {values} from './content';
 
 export function ValuesExperience(){
   const [index,setIndex]=useState(0);
-  return <WorldShell label="Our perspective" position={`${42+index*6}%`}>
+  return <WorldShell image="@values.png" label="Our perspective" position={`${42+index*6}%`}>
     <div className="world-intro"><div><p className="world-kicker">OUR VALUES / A DIFFERENT PERSPECTIVE</p><h1>What keeps<br/><em>us grounded.</em></h1></div><p className="world-intro-note">The beliefs behind the things we build.<br/>Explore one thought at a time.</p></div>
     <section className="values-observatory" aria-label="Our values">
       <div className="value-orbit" aria-label="Choose a value">{values.map((value,i)=><button key={value.title} aria-label={`${i+1}. ${value.title}`} aria-pressed={i===index} onClick={()=>setIndex(i)} style={{transform:`rotate(${i*90}deg) translateY(-112px) rotate(${-i*90}deg)`}}><span>0{i+1}</span></button>)}<span className="orbit-center">A HUMAN<br/>TOMORROW</span></div>
