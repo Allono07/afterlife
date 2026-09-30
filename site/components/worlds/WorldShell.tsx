@@ -3,8 +3,9 @@
 import {useEffect, useState, type ReactNode, type CSSProperties} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import {MenuIcon} from '@/components/navigation/MenuIcon';
 import {usePathname} from 'next/navigation';
-import {ArrowLeft, ArrowUpRight, Menu, X} from 'lucide-react';
+import {ArrowLeft, ArrowUpRight} from 'lucide-react';
 
 export function WorldShell({children,image='softwarelab',label,position='50%'}:{children:ReactNode;image?:string;label:string;position?:string}) {
   const [menu,setMenu]=useState(false);
@@ -21,8 +22,8 @@ export function WorldShell({children,image='softwarelab',label,position='50%'}:{
     <header className="world-header">
       <Link className="world-home" href="/" aria-label="Return to the Earth scene"><ArrowLeft size={15}/><span>Home</span></Link>
       <Link className="world-brand" href="/">Afterlife <span>Theory</span> Labs</Link>
-      <button className="world-menu-toggle" aria-label={menu?'Close navigation':'Open navigation'} aria-expanded={menu} aria-controls="world-navigation" onClick={()=>setMenu(!menu)}>{menu?<X size={20}/>:<Menu size={20}/>}</button>
-      <nav id="world-navigation" className={`world-nav ${menu?'is-open':''}`} aria-label="Main navigation">
+      <button className="world-menu-toggle" aria-label={menu?'Close navigation':'Open navigation'} aria-expanded={menu} aria-controls="world-navigation" onClick={()=>setMenu(!menu)}><MenuIcon open={menu}/></button>
+      <nav onClick={()=>setMenu(false)} id="world-navigation" className={`world-nav ${menu?'is-open':''}`} aria-label="Main navigation">
         <Link href="/lab" aria-current={pathname?.startsWith('/lab')?'page':undefined}>What we do</Link>
         <Link href="/values" aria-current={pathname==='/values'?'page':undefined}>Values</Link>
         <Link href="/contact" aria-current={pathname==='/contact'?'page':undefined}>Contact <ArrowUpRight size={13}/></Link>

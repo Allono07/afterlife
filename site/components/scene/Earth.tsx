@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { type RefObject, useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+import type { EarthFlight } from './flight';
 
 export const SUN=new THREE.Vector3(-5,6,3).normalize();
 // A modestly smaller globe opens more negative space above the lunar horizon
@@ -48,7 +49,7 @@ function Atmosphere() {
   return <mesh material={material}><sphereGeometry args={[RADIUS*1.012,96,64]}/></mesh>;
 }
 
-export function Earth({moving,mobile}:{moving:boolean;mobile:boolean}) {
+export function Earth({moving,mobile,flight}:{moving:boolean;mobile:boolean;flight:RefObject<EarthFlight>}) {
   const surface=useRef<THREE.Mesh>(null), clouds=useRef<THREE.Mesh>(null);
   const loadedTextures=useTexture(['day','clouds','night'].map(n=>`/assets/earth-v2/${n}${mobile && n!=='day'?'-mobile':''}.webp`));
   const [day,cloud,night]=useMemo(()=>loadedTextures.map((source,index)=>{
@@ -58,7 +59,15 @@ export function Earth({moving,mobile}:{moving:boolean;mobile:boolean}) {
     return texture;
   }) as [THREE.Texture,THREE.Texture,THREE.Texture],[loadedTextures]);
   useEffect(()=>()=>{day.dispose();cloud.dispose();night.dispose();},[day,cloud,night]);
-  useFrame((_,delta)=>{if(!moving)return;const step=Math.min(delta,.05)*(mobile?3:1);if(surface.current)surface.current.rotation.y+=step*.019;if(clouds.current)clouds.current.rotation.y+=step*.024;});
+  useFrame((_,delta)=>{
+    if(!moving && !flight.current.active)return;
+    const step=Math.min(delta,.05);
+    const base=mobile?3:1;
+    // Add speed to the existing rotations; never replace their live angles.
+    const acceleration=flight.current.active?.55*Math.pow(Math.sin(flight.current.progress*Math.PI/2),2):0;
+    if(surface.current)surface.current.rotation.y+=step*(base*.019+acceleration);
+    if(clouds.current)clouds.current.rotation.y+=step*(base*.024+acceleration);
+  });
   return <group position={[0,mobile ? -1.62 : -.75,0]} rotation={[.16,0,.12]}>
     <mesh ref={surface} rotation={[0,ROTATION,0]}>
       <sphereGeometry args={[RADIUS,mobile?112:144,mobile?72:96]}/>

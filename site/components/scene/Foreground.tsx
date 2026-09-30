@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { type RefObject, useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+import type { EarthFlight } from './flight';
 
 /** The supplied panorama already contains natural rock relief and cast shadows. */
-export function Foreground({mobile}: {mobile: boolean}) {
+export function Foreground({mobile,flight}: {mobile:boolean;flight:RefObject<EarthFlight>}) {
   const source=useTexture('/assets/lunarsurface.png');
   const plate=useRef<THREE.Mesh>(null);
   const anchor=useMemo(()=>new THREE.Vector3(0,0,3),[]);
@@ -20,6 +21,8 @@ export function Foreground({mobile}: {mobile: boolean}) {
   useEffect(()=>()=>texture.dispose(),[texture]);
   useFrame(({viewport,camera})=>{
     if(!plate.current)return;
+    (plate.current.material as THREE.MeshBasicMaterial).opacity=1-THREE.MathUtils.smoothstep(flight.current.progress,0,.18);
+    plate.current.visible=flight.current.progress<.18;
     const view=viewport.getCurrentViewport(camera,anchor);
     // Cover the lower frame without stretching the panorama on portrait screens.
     const width=Math.max(view.width*1.08,view.height*1.05);
@@ -35,8 +38,8 @@ export function Foreground({mobile}: {mobile: boolean}) {
 }
 
 /** A rear-view photographic character plate keeps the small hero figure natural. */
-export function SeatedBoy({mobile}: {mobile:boolean}) {
-  const loadedTexture=useTexture('/assets/boy-cinematic.webp');
+export function SeatedBoy({mobile,flight}: {mobile:boolean;flight:RefObject<EarthFlight>}) {
+  const loadedTexture=useTexture('/assets/astronautboy.webp');
   const texture=useMemo(()=>{
     const copy=loadedTexture.clone();
     copy.colorSpace=THREE.SRGBColorSpace;
@@ -44,12 +47,20 @@ export function SeatedBoy({mobile}: {mobile:boolean}) {
     return copy;
   },[loadedTexture]);
   useEffect(()=>()=>texture.dispose(),[texture]);
-  // Slightly larger at desktop size so the hair, hood stitching, and fabric
-  // folds hold up at normal viewing distance while remaining small vs Earth.
-  const size=mobile ? 2 : 2.05;
+  const plate=useRef<THREE.Mesh>(null);
+  useFrame(()=>{
+    if(!plate.current)return;
+    (plate.current.material as THREE.MeshBasicMaterial).opacity=1-THREE.MathUtils.smoothstep(flight.current.progress,0,.18);
+    plate.current.visible=flight.current.progress<.18;
+  });
+  const size=mobile ? 2.3 : 2.35;
+  const height=size*1214/1295;
+  // The PNG's seated base is 6.5% above its lower edge; align that point to
+  // the ground and center the child (the helmet extends to his right).
+
   return <group position={[0,mobile ? -6.02 : -3.34,3.12]}>
-    <mesh position={[0,size*.47,.06]} renderOrder={4}>
-      <planeGeometry args={[size,size]}/>
+    <mesh ref={plate} position={[size*.08,height*.435,.06]} renderOrder={4}>
+      <planeGeometry args={[size,height]}/>
       <meshBasicMaterial map={texture} transparent alphaTest={.025} toneMapped={false} depthWrite={false}/>
     </mesh>
   </group>;

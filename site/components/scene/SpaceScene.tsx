@@ -1,10 +1,11 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { type RefObject, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { addAfterEffect, Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 import { Earth, SUN } from './Earth';
+import {createEarthFlight, type EarthFlight} from './flight';
 import { Sunlight } from './Sunlight';
 import { Satellite } from './Satellite';
 import { Foreground, SeatedBoy } from './Foreground';
@@ -13,11 +14,12 @@ gsap.registerPlugin(ScrollTrigger);
 // Mobile browser chrome resizing should not repeatedly rebuild scroll measurements.
 ScrollTrigger.config({ignoreMobileResize:true});
 
-function CameraRig({reduced, moving, mobile, onApproach}: {reduced:boolean; moving:boolean; mobile:boolean; onApproach:(value:boolean)=>void}) {
+function CameraRig({reduced, moving, mobile, onApproach, flight}: {reduced:boolean; moving:boolean; mobile:boolean; flight:RefObject<EarthFlight>; onApproach:(value:boolean)=>void}) {
   const { camera, invalidate }=useThree();
   const progress=useRef({value:0});
   const cursor=useRef({x:0,y:0});
   const approached=useRef(false);
+  const departure=useRef<{sample:ReturnType<typeof createEarthFlight>;startedAt:number}|null>(null);
   const target=useMemo(()=>new THREE.Vector3(),[]);
   const look=useMemo(()=>new THREE.Vector3(),[]);
   useEffect(()=>{
@@ -32,6 +34,20 @@ function CameraRig({reduced, moving, mobile, onApproach}: {reduced:boolean; movi
     return ()=> {window.removeEventListener('pointermove',move);ctx.revert();};
   },[reduced,invalidate,onApproach]);
   useFrame((_,delta)=>{
+    if(flight.current.active){
+      if(!departure.current){
+        departure.current={
+          sample:createEarthFlight(camera.position,camera.quaternion,new THREE.Vector3(0,mobile?-1.62:-.75,0),flight.current.direction),
+          startedAt:flight.current.progress,
+        };
+      }
+      const {sample,startedAt}=departure.current;
+      const p=(flight.current.progress-startedAt)/Math.max(1-startedAt,.0001);
+      sample(p,camera.position,camera.quaternion);
+      invalidate();
+      return;
+    }
+    departure.current=null;
     const nextApproached=progress.current.value>.6;
     if(nextApproached!==approached.current){approached.current=nextApproached;onApproach(nextApproached);}
     const p=reduced ? 0 : progress.current.value;
@@ -76,25 +92,26 @@ function ContextEvents({onError}: {onError:()=>void}) {
   return null;
 }
 
-export default function SpaceScene({reduced,paused,onReady,onError,onApproach}:{reduced:boolean;paused:boolean;onReady:()=>void;onError:()=>void;onApproach:(value:boolean)=>void}) {
+export default function SpaceScene({reduced,paused,onReady,onError,onApproach,flight,departing}:{departing:boolean;flight:RefObject<EarthFlight>;reduced:boolean;paused:boolean;onReady:()=>void;onError:()=>void;onApproach:(value:boolean)=>void}) {
   const [mobile,setMobile]=useState(()=>window.innerWidth<700);
   const [visible,setVisible]=useState(true);
   const [dpr,setDpr]=useState(()=>Math.min(window.devicePixelRatio,2));
   const moving=!reduced&&!paused&&visible;
+  const cameraOptions=useMemo(()=>({position:[0,0,mobile?22.5:14] as [number,number,number],fov:42,near:.1,far:150}),[mobile]);
   useEffect(()=>{
     const resize=()=>setMobile(window.innerWidth<700);
     const visibility=()=>setVisible(!document.hidden);
     window.addEventListener('resize',resize);document.addEventListener('visibilitychange',visibility);
     return ()=>{window.removeEventListener('resize',resize);document.removeEventListener('visibilitychange',visibility);};
   },[]);
-  return <Canvas shadows={mobile ? false : 'soft'} camera={{position:[0,0,mobile ? 22.5 : 14],fov:42,near:.1,far:150}} dpr={dpr} frameloop={moving ? 'always' : 'demand'} resize={{scroll:false,debounce:{scroll:0,resize:120}}} gl={{antialias:true,powerPreference:'high-performance',alpha:true}} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.02;}} fallback={<span>This scene requires WebGL.</span>}>
+  return <Canvas shadows={mobile ? false : 'soft'} camera={cameraOptions} dpr={dpr} frameloop={moving || departing ? 'always' : 'demand'} resize={{scroll:false,debounce:{scroll:0,resize:120}}} gl={{antialias:true,powerPreference:'high-performance',alpha:true}} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.02;}} fallback={<span>This scene requires WebGL.</span>}>
     <ContextEvents onError={onError}/>
     {moving && <PerformanceMonitor ms={300} iterations={10} bounds={()=>[45,58]}
       onDecline={()=>setDpr(value=>Math.min(window.devicePixelRatio,Math.max(1.5,value-.25)))}
       onIncline={()=>setDpr(value=>Math.min(window.devicePixelRatio,2,value+.25))}/>}
     <ambientLight intensity={.2}/><directionalLight position={[SUN.x*18,SUN.y*18,SUN.z*18]} intensity={3.8} color="#fff2dc" castShadow={!mobile} shadow-mapSize={[2048,2048]} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0003}/>
     <hemisphereLight args={['#a2b7cb','#070809',.16]}/>
-    <Suspense fallback={null}><Sunlight mobile={mobile}/><Earth moving={moving} mobile={mobile}/><Satellite moving={moving} mobile={mobile}/><Foreground mobile={mobile}/><SeatedBoy mobile={mobile}/><Loaded onReady={onReady}/></Suspense>
-    <CameraRig reduced={reduced} moving={moving} mobile={mobile} onApproach={onApproach}/>
+    <Suspense fallback={null}><Sunlight mobile={mobile}/><Earth moving={moving} mobile={mobile} flight={flight}/><Satellite moving={moving} mobile={mobile}/><Foreground mobile={mobile} flight={flight}/><SeatedBoy mobile={mobile} flight={flight}/><Loaded onReady={onReady}/></Suspense>
+    <CameraRig reduced={reduced} moving={moving} mobile={mobile} onApproach={onApproach} flight={flight}/>
   </Canvas>;
 }
