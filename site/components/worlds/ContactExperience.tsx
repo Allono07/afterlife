@@ -1,24 +1,25 @@
 "use client";
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {ArrowLeft,ArrowUpRight,Check,Copy} from 'lucide-react';
-import {useSearchParams} from 'next/navigation';
 import {WorldShell} from './WorldShell';
 import {labs} from './content';
 
 const interests=[...labs.software.services,...labs.ads.services].map(service=>service.label);
 type Enquiry={name:string;email:string;interest:string;message:string};
 export function ContactExperience(){
-  const queryInterest=useSearchParams().get('interest');
-  const [chosenInterest,setInterest]=useState<string|null>(null);
-  const interest=chosenInterest??(queryInterest&&interests.includes(queryInterest)?queryInterest:'');
+  const interestRef=useRef<HTMLSelectElement>(null);
   const formRef=useRef<HTMLFormElement>(null);
   const reviewTitle=useRef<HTMLHeadingElement>(null);
   const [review,setReview]=useState<Enquiry|null>(null);
   const [copyStatus,setCopyStatus]=useState('');
+  useEffect(()=>{
+    const queryInterest=new URLSearchParams(window.location.search).get('interest');
+    if(queryInterest&&interests.includes(queryInterest)&&interestRef.current)interestRef.current.value=queryInterest;
+  },[]);
   useEffect(()=>{if(review)reviewTitle.current?.focus();},[review]);
   function reviewEnquiry(event:FormEvent<HTMLFormElement>){
     event.preventDefault();const data=new FormData(event.currentTarget);
-    setReview({name:String(data.get('name')).trim(),email:String(data.get('email')).trim(),interest,message:String(data.get('message')).trim()});
+    setReview({name:String(data.get('name')).trim(),email:String(data.get('email')).trim(),interest:String(data.get('interest')).trim(),message:String(data.get('message')).trim()});
     setCopyStatus('');
   }
   async function copy(){
@@ -34,7 +35,7 @@ export function ContactExperience(){
           <input type="hidden" name="form-name" value="contact" />
           <p className="world-kicker">TELL US WHAT YOU’RE THINKING</p>
           <div className="contact-fields"><label>Your name<input name="name" autoComplete="name" required maxLength={100} /></label><label>Email address<input name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com"/></label></div>
-          <label>What would you like to create?<select name="interest" required value={interest} onChange={e=>setInterest(e.target.value)}><option value="" disabled>Choose a starting point</option><optgroup label="Software & AI Solutions">{labs.software.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><optgroup label="Media Content Creation">{labs.ads.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><option>Something else / Let’s explore</option></select></label>
+          <label>What would you like to create?<select ref={interestRef} name="interest" required defaultValue=""><option value="" disabled>Choose a starting point</option><optgroup label="Software & AI Solutions">{labs.software.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><optgroup label="Media Content Creation">{labs.ads.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><option>Something else / Let’s explore</option></select></label>
           <label>A little about your idea<textarea name="message" required minLength={10} maxLength={5000} rows={4} placeholder="What are you hoping to build, change, or create?"/></label>
           <button type="submit" className="world-action">Review enquiry <ArrowUpRight size={18}/></button>
           <p className="contact-notice">Review your enquiry before sending it.</p>
