@@ -7,7 +7,6 @@ export const labs = {
   software: {
     number: '01', name: 'Software & AI Solutions', image: 'softwarelab',
     title: ['Grounded in context.', 'Built for possibility.'],
-    intro: 'From your first idea to the systems that move your business forward.',
     services: [
       {id:'context-models',label:'Business-context AI',title:'Your context. More relevant intelligence.',description:'We build and adapt AI around your business knowledge and real tasks with natively built ML models. The focus: more relevant answers and an inference cost that fits the job.',steps:['Your business context','Model & evaluation','Relevant, efficient AI'],outcome:'A model approach shaped around your data, quality needs, and operating budget.'},
       {id:'ai-workflows',label:'AI workflows',title:'Let the work flow.',description:'Connect AI to the tools and processes your team already uses. We build workflows that handle repetitive steps and bring people in where judgement matters.',steps:['Map the process','Connect the tools','Automate with oversight'],outcome:'Connected workflows, clear handoffs, and human review where it counts.'},

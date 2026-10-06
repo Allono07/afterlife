@@ -5,6 +5,8 @@ import Link from 'next/link';
 import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight} from 'lucide-react';
 import {WorldShell} from './WorldShell';
 import {labs} from './content';
+import {ProjectGallery} from '../projects/ProjectGallery';
+import {WorldObject} from './WorldObject';
 
 export function LabExperience({kind}:{kind:keyof typeof labs}) {
   const lab=labs[kind];
@@ -23,9 +25,10 @@ export function LabExperience({kind}:{kind:keyof typeof labs}) {
   return <WorldShell image={lab.image} label={lab.name} position={`${45+selected*4}%`}>
     <div className="world-intro">
       <div><Link className="world-kicker back-to-labs" href="/lab"><ArrowLeft size={12}/> WHAT WE DO / {lab.number}</Link><h1>{lab.title[0]}<br/><em>{lab.title[1]}</em></h1></div>
-      <p className="world-intro-note">{lab.intro}<span><ArrowDown size={14}/> Choose a path below</span></p>
     </div>
-    <section className="service-dock" aria-label={lab.name}>
+    {kind==='software'&&<ProjectGallery/>}
+    <div className="solutions-intro" id="solutions"><div><p className="world-kicker">SOLUTIONS / FROM POSSIBILITY TO PRACTICE</p><h2>{kind==='software'?'What can we build together?':'What can we create together?'}</h2><p>Choose a direction. Explore how we approach it.</p></div>{kind==='software'&&<WorldObject kind="terrain" selected={selected}/>}</div>
+    <section className="service-dock expanded-services" aria-label={lab.name}>
       <div className="service-path">
         <div className="world-kicker">{lab.name}<span>{String(selected+1).padStart(2,'0')} / 0{lab.services.length}</span></div>
         <div className="service-tabs" role="tablist" aria-label="Explore our services">
@@ -42,6 +45,7 @@ export function LabExperience({kind}:{kind:keyof typeof labs}) {
         <h2>{service.title}</h2><p>{service.description}</p>
         <ol className={`service-process process-${kind}`} aria-label="Our approach">{service.steps.map((step,index)=><li key={step}><span className="process-point">{kind==='ads'?['◯','◇','✳'][index]:`0${index+1}`}</span><span>{step}</span></li>)}</ol>
         <p className="service-outcome">{service.outcome}</p>
+        {kind==='software'&&<ProjectGallery service={service.id} compact/>}
         <Link className="world-action" href={`/contact?interest=${encodeURIComponent(service.label)}`}>Let’s build this together <ArrowUpRight size={18}/></Link>
       </div>
     </section>

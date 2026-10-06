@@ -3,6 +3,7 @@ import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {ArrowLeft,ArrowUpRight,Check,Copy} from 'lucide-react';
 import {WorldShell} from './WorldShell';
 import {labs} from './content';
+import {WorldObject} from './WorldObject';
 
 const interests=[...labs.software.services,...labs.ads.services].map(service=>service.label);
 type Enquiry={name:string;email:string;interest:string;message:string};
@@ -53,7 +54,7 @@ export function ContactExperience(){
   }
   return <WorldShell image="@contact.webp" label="Start a conversation">
     <div className="contact-layout">
-      <div className="contact-intro"><p className="world-kicker">CONTACT / EVERY IDEA STARTS SOMEWHERE</p><h1>Something<br/>on your<br/><em>horizon?</em></h1><p>A half-formed idea, a business challenge, or a story waiting to be told. We’d love to hear it.</p></div>
+      <div className="contact-intro"><p className="world-kicker">CONTACT / EVERY IDEA STARTS SOMEWHERE</p><h1>Something on <em>your horizon?</em></h1><p>A half-formed idea, a business challenge, or a story waiting to be told. We’d love to hear it.</p></div>
       <section className="contact-panel" aria-label="Project enquiry">
         <form ref={formRef} name="contact" method="POST" data-netlify="true" onSubmit={reviewEnquiry} hidden={review!==null}>
           <input type="hidden" name="form-name" value="contact" />
@@ -118,6 +119,7 @@ export function ContactExperience(){
     </div>
   )
 )}      </section>
+      <div className="contact-location"><WorldObject kind="india"/><div className="location-caption"><div><span>OUR COORDINATES</span><strong>Bengaluru, Karnataka, IN</strong></div><a href="https://www.openstreetmap.org/?mlat=12.9716&mlon=77.5946#map=12/12.9716/77.5946" target="_blank" rel="noopener noreferrer" aria-label="View Bengaluru on OpenStreetMap"><ArrowUpRight size={19}/></a></div></div>
     </div>
   </WorldShell>;
 }
