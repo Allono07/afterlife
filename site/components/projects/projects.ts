@@ -3,7 +3,7 @@ export type ProjectMedia={src:string;alt:string;device:'desktop'|'mobile'};
 export type Project={id:string;name:string;url:string;summary:string;categories:ProjectCategory[];services:string[];stack:string[];media:ProjectMedia[];video?:string;accent:string};
 const assets='/assets/projects/';
 export const projects:Project[]=[
-  {id:'trashbuddy',name:'Trashbuddy',url:'https://trashbuddy.in',summary:'A connected web and mobile experience for waste collection, with map-based location tracking and the backend behind it.',categories:['web','app','backend'],services:['products'],stack:['Redis Streams','Firebase','OpenStreetMap','Redis'],accent:'#467547',video:assets+'trashbuddy-desktop.mp4',media:[
+  {id:'trashbuddy',name:'Trashbuddy',url:'https://trashbuddy.in',summary:'An application that tracks BBMP waste collection autos and alerts you when they are near your building, so you never miss your garbage disposal.',categories:['web','app','backend'],services:['products'],stack:['Redis Streams','Firebase','OpenStreetMap','Redis'],accent:'#467547',video:assets+'trashbuddy-desktop.mp4',media:[
     {src:assets+'trashbuddy-desktop.webp',alt:'Trashbuddy website preview',device:'desktop'},
     {src:assets+'trashbuddy_mobile_app_1.webp',alt:'Trashbuddy mobile app showing an active location-sharing session',device:'mobile'},
     {src:assets+'trashbuddy_mobile_app_2.webp',alt:'Trashbuddy mobile app map interface',device:'mobile'},
