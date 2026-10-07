@@ -3,14 +3,15 @@ import {Canvas,useFrame,useThree} from '@react-three/fiber';
 import {useGLTF} from '@react-three/drei';
 import * as THREE from 'three';
 import {IndiaMap} from './IndiaMap';
+import {ValuesArtifact} from './ValuesArtifact';
 
-function Model({kind}:{kind:'terrain'|'sculpture'}){
-  const {scene}=useGLTF(`/assets/${kind==='terrain'?'highland_landscape_fragment':'limestone_open_circular_sculpture'}.glb`);
+function TerrainModel(){
+  const {scene}=useGLTF('/assets/highland_landscape_fragment.glb');
   const object=useMemo(()=>{
     const copy=scene.clone(true);copy.rotation.x=-Math.PI/2;copy.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(copy);const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
-    const factor=(kind==='terrain'?4.6:4.1)/Math.max(size.x,size.y,size.z);
+    const factor=4.6/Math.max(size.x,size.y,size.z);
     copy.position.sub(center);const group=new THREE.Group();group.add(copy);group.scale.setScalar(factor);return group;
-  },[scene,kind]);
+  },[scene]);
   return <primitive object={object}/>;
 }
 function Assembly({kind,turn,selected,reduced}:{kind:'terrain'|'sculpture'|'india';turn:number;selected:number;reduced:boolean}){
@@ -24,7 +25,7 @@ function Assembly({kind,turn,selected,reduced}:{kind:'terrain'|'sculpture'|'indi
     if(Math.abs(root.current.rotation.y-target)>.0001)invalidate();
   });
   return <group ref={root} onPointerMove={()=>invalidate()} rotation={[kind==='india'?.18:0,0,0]}>
-    {kind==='india'?<IndiaMap/>:<Model kind={kind}/>}
+    {kind==='india'?<IndiaMap/>:kind==='sculpture'?<ValuesArtifact selected={selected}/>:<TerrainModel/>}
     {kind==='terrain'&&<group position={[0,.55,0]}>
       {Array.from({length:3},(_,i)=><group key={i} position={[(i-1)*.9,.2+(i===1?.2:0),0]}><mesh rotation={[0,.3,0]}><boxGeometry args={[.52,.65,.12]}/><meshStandardMaterial color={i===selected%3?'#94b29c':'#e9e9dc'} metalness={.2} roughness={.45}/></mesh><mesh position={[0,0,.07]}><planeGeometry args={[.34,.035]}/><meshStandardMaterial color="#476558"/></mesh></group>)}
     </group>}

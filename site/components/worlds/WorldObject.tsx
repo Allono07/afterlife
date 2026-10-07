@@ -20,7 +20,7 @@ export function WorldObject({kind,selected=0}:{kind:'terrain'|'sculpture'|'india
     const media=window.matchMedia('(prefers-reduced-motion: reduce)');const sync=()=>setReduced(media.matches);sync();media.addEventListener('change',sync);
     return()=>{observer.disconnect();media.removeEventListener('change',sync);};
   },[]);
-  const label=kind==='india'?'Three-dimensional map of India with Bengaluru marked':kind==='sculpture'?'Limestone sculpture representing our values':'Highland terrain with an interactive service model';
+  const label=kind==='india'?'Three-dimensional map of India with Bengaluru marked':kind==='sculpture'?'Four stacked stones representing our values':'Highland terrain with an interactive service model';
   return <div ref={root} className={`world-object object-${kind}`}>
     <div className="object-canvas" role="group" tabIndex={0} aria-label={`${label}. Drag horizontally or use left and right arrow keys to rotate.`}
       onPointerDown={e=>{if(e.button!==0)return;drag.current={x:e.clientX,turn};e.currentTarget.setPointerCapture(e.pointerId);}}
