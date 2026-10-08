@@ -1,30 +1,14 @@
 "use client";
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import Image from 'next/image';
-import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Monitor,Pause,Play,Smartphone,X} from 'lucide-react';
+import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Monitor,Play,Smartphone,X} from 'lucide-react';
 import {categoryLabels,projects,type Project,type ProjectCategory} from './projects';
-
-function canPreview(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !(navigator as Navigator&{connection?:{saveData?:boolean}}).connection?.saveData;}
-
-function useAutoPreview(){
-  const [allowed,setAllowed]=useState(false);
-  useEffect(()=>{
-    const media=window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync=()=>setAllowed(canPreview());
-    sync();media.addEventListener('change',sync);
-    return()=>media.removeEventListener('change',sync);
-  },[]);
-  return allowed;
-}
 
 function PhoneCarousel({project,small=false,suspended=false}:{project:Project;small?:boolean;suspended?:boolean}){
   const images=project.media.filter(item=>item.device==='mobile');
   const track=useRef<HTMLDivElement>(null);
   const [slide,setSlide]=useState(0);
   const [visible,setVisible]=useState(false);
-  const [paused,setPaused]=useState(false);
-  const autoAllowed=useAutoPreview();
-  const resumeAt=useRef(0);
   useEffect(()=>{
     const element=track.current;
     if(!element||images.length<2)return;
@@ -33,22 +17,21 @@ function PhoneCarousel({project,small=false,suspended=false}:{project:Project;sm
     return()=>observer.disconnect();
   },[images.length]);
   useEffect(()=>{
-    if(!visible||suspended||paused||images.length<2||!autoAllowed)return;
+    if(!visible||suspended||images.length<2)return;
     const timer=window.setInterval(()=>{
-      if(document.hidden||Date.now()<resumeAt.current)return;
+      if(document.hidden)return;
       const element=track.current;
       if(!element)return;
       const next=(Math.round(element.scrollLeft/element.clientWidth)+1)%images.length;
       element.scrollTo({left:next*element.clientWidth,behavior:'smooth'});
     },3800);
     return()=>window.clearInterval(timer);
-  },[visible,suspended,paused,autoAllowed,images.length]);
-  const pauseAfterInput=()=>{resumeAt.current=Date.now()+10000;};
+  },[visible,suspended,images.length]);
   return <div className={`phone-carousel${small?' phone-carousel-small':''}`} role="region" aria-label={`${project.name} mobile screenshots`}>
-    <div ref={track} className="phone-carousel-track" tabIndex={0} onPointerDown={pauseAfterInput} onScroll={e=>{const el=e.currentTarget;setSlide(Math.round(el.scrollLeft/el.clientWidth));}} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();pauseAfterInput();track.current?.scrollTo({left:Math.max(0,Math.min(images.length-1,slide+(e.key==='ArrowRight'?1:-1)))*(track.current?.clientWidth||0),behavior:'auto'});}}}>
+    <div ref={track} className="phone-carousel-track" tabIndex={0} onScroll={e=>{const el=e.currentTarget;setSlide(Math.round(el.scrollLeft/el.clientWidth));}} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();track.current?.scrollTo({left:Math.max(0,Math.min(images.length-1,slide+(e.key==='ArrowRight'?1:-1)))*(track.current?.clientWidth||0),behavior:'auto'});}}}>
       {images.map((item,i)=><div className="phone-slide" key={item.src} role="group" aria-label={`${i+1} of ${images.length}`}><Image src={item.src} alt={item.alt} width={660} height={1400} unoptimized draggable={false}/></div>)}
     </div>
-    {images.length>1&&<div className="phone-carousel-dots">{images.map((item,i)=><button key={item.src} aria-label={`Show mobile screenshot ${i+1}`} aria-pressed={slide===i} onClick={()=>{pauseAfterInput();track.current?.scrollTo({left:i*track.current.clientWidth,behavior:'auto'});}}><span/></button>)}{autoAllowed&&<button className="phone-carousel-pause" aria-label={paused?'Play mobile screenshots':'Pause mobile screenshots'} aria-pressed={paused} onClick={()=>setPaused(value=>!value)}>{paused?<Play size={small?9:12}/>:<Pause size={small?9:12}/>}</button>}</div>}
+    {images.length>1&&<div className="phone-carousel-dots" aria-hidden="true">{images.map((item,i)=><span key={item.src} className={slide===i?'is-active':''}/>)}</div>}
   </div>;
 }
 
@@ -58,9 +41,6 @@ function ProjectCard({project,compact,onOpen,suspended}:{project:Project;compact
   const [active,setActive]=useState(false);
   const [visible,setVisible]=useState(false);
   const [playing,setPlaying]=useState(false);
-  const [manual,setManual]=useState(false);
-  const [pausedByUser,setPausedByUser]=useState(false);
-  const autoAllowed=useAutoPreview();
   const mobile=project.media.find(item=>item.device==='mobile');
   useEffect(()=>{
     const element=card.current;if(!element)return;
@@ -68,30 +48,28 @@ function ProjectCard({project,compact,onOpen,suspended}:{project:Project;compact
     observer.observe(element);
     return()=>observer.disconnect();
   },[]);
-  const loaded=!!project.video&&visible&&(manual||autoAllowed);
+  const loaded=!!project.video&&visible;
   useEffect(()=>{
     const element=video.current;
     if(!element)return;
     let cancelled=false;
-    if(visible&&!suspended&&!pausedByUser&&!document.hidden&&(manual||autoAllowed))element.play().then(()=>{if(cancelled)element.pause();}).catch(()=>{});else element.pause();
+    if(visible&&!suspended&&!document.hidden)element.play().then(()=>{if(cancelled)element.pause();}).catch(()=>{});else element.pause();
     return()=>{cancelled=true;element.pause();};
-  },[visible,loaded,manual,autoAllowed,pausedByUser,suspended]);
+  },[visible,loaded,suspended]);
   useEffect(()=>{
     const element=video.current;
     if(!element)return;
     const observer=new IntersectionObserver(entries=>{if(!entries[0].isIntersecting)element.pause();});
     observer.observe(element);
-    const hide=()=>{if(document.hidden)element.pause();else if(visible&&!suspended&&!pausedByUser&&(manual||autoAllowed))element.play().catch(()=>{});};
+    const hide=()=>{if(document.hidden)element.pause();else if(visible&&!suspended)element.play().catch(()=>{});};
     document.addEventListener('visibilitychange',hide);
     return()=>{observer.disconnect();document.removeEventListener('visibilitychange',hide);};
-  },[loaded,visible,suspended,pausedByUser,manual,autoAllowed]);
-  const start=()=>{if(canPreview())setActive(true);};
-  return <article ref={card} className={`project-card${compact?' is-compact':''}${active?' is-previewing':''}`} style={{'--project-accent':project.accent} as CSSProperties} onPointerEnter={event=>{if(event.pointerType==='mouse')start();}} onPointerLeave={()=>setActive(false)} onFocus={event=>{if(!event.target.closest('.preview-toggle'))start();}} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setActive(false);}}>
+  },[loaded,visible,suspended]);
+  return <article ref={card} className={`project-card${compact?' is-compact':''}${active?' is-previewing':''}`} style={{'--project-accent':project.accent} as CSSProperties} onPointerEnter={event=>{if(event.pointerType==='mouse')setActive(true);}} onPointerLeave={()=>setActive(false)} onFocus={()=>setActive(true)} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setActive(false);}}>
     <div className="project-stage">
-      <div className="project-browser"><div className="browser-chrome" aria-hidden="true"><i/><i/><i/><span>{new URL(project.url).hostname}</span></div><div className="project-screen"><Image src={project.media[0].src} alt={project.media[0].alt} fill sizes={compact?'300px':'(max-width:700px) 90vw, 45vw'} unoptimized/>{project.video&&loaded&&<video ref={video} src={project.video} muted loop playsInline preload="none" aria-hidden="true" className={playing?'is-playing':''} onPlaying={()=>setPlaying(true)} onPause={()=>setPlaying(false)}/>}</div></div>
+      <div className="project-browser"><div className="browser-chrome" aria-hidden="true"><i/><i/><i/><span>{new URL(project.url).hostname}</span></div><div className="project-screen"><Image src={project.media[0].src} alt={project.media[0].alt} fill sizes={compact?'300px':'(max-width:700px) 90vw, 45vw'} unoptimized/>{project.video&&loaded&&<video ref={video} src={project.video} autoPlay muted loop playsInline preload="none" aria-hidden="true" className={playing?'is-playing':''} onPlaying={()=>setPlaying(true)} onPause={()=>setPlaying(false)}/>}</div></div>
       {mobile&&<div className="project-phone"><PhoneCarousel project={project} small suspended={suspended}/></div>}
       <button className="project-open" onClick={onOpen} aria-label={`View ${project.name} project`}><span>View project <ArrowUpRight size={16}/></span></button>
-      {!compact&&project.video&&<button className="preview-toggle" onClick={()=>{if(playing){setPausedByUser(true);video.current?.pause();}else{setManual(true);setPausedByUser(false);video.current?.play().catch(()=>{});}}} aria-label={`${playing?'Pause':'Play'} ${project.name} preview`} aria-pressed={playing}>{playing?<Pause size={12}/>:<Play size={12}/>}<span>{playing?'Pause preview':'Play preview'}</span></button>}
     </div>
     <div className="project-caption"><div><p>{project.categories.map(item=>categoryLabels[item]).join(' / ')}</p><h3><button onClick={onOpen}>{project.name}</button></h3></div><button className="project-arrow" onClick={onOpen} aria-label={`Explore ${project.name}`}><ArrowUpRight size={22} strokeWidth={1.4}/></button></div>
     {!compact&&<p className="project-summary">{project.summary}</p>}
@@ -102,7 +80,7 @@ function ProjectDetail({project,onClose}:{project:Project;onClose:()=>void}){
   const dialog=useRef<HTMLDialogElement>(null);
   const [device,setDevice]=useState<'desktop'|'mobile'>(()=>typeof window!=='undefined'&&window.innerWidth<700?'mobile':'desktop');
   const [index,setIndex]=useState(0);
-  const [showVideo,setShowVideo]=useState(()=>!!project.video&&typeof window!=='undefined'&&window.innerWidth>=700&&canPreview());
+  const [showVideo,setShowVideo]=useState(()=>!!project.video&&typeof window!=='undefined'&&window.innerWidth>=700);
   const media=project.media.filter(item=>item.device===device);
   const current=media[index]||media[0];
   useEffect(()=>{

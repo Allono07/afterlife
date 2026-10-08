@@ -4,4 +4,4 @@ Edit `projects.ts` to add projects. Categories drive the available filters; serv
 
 The original user media stays in public/assets. Optimized WebP images and the browser-compatible Trashbuddy MP4 are in public/assets/projects. Trashbuddy's website poster is a frame from the supplied recording. Mayaloka has screenshots only at present.
 
-Cards play muted recordings on hover/focus unless reduced motion or Save-Data is enabled. Explicit preview controls and the project dialog support touch and keyboard. External website links open only on explicit activation.
+Cards automatically play muted, looping recordings while visible. Mobile screenshots auto-advance and remain swipeable, with passive pagination indicators and no playback controls. The project dialog supports touch and keyboard. External website links open only on explicit activation.

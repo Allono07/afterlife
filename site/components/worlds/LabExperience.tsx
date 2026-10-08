@@ -2,7 +2,7 @@
 
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
-import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight} from 'lucide-react';
 import {WorldShell} from './WorldShell';
 import {labs} from './content';
 import {ProjectGallery} from '../projects/ProjectGallery';
@@ -38,7 +38,7 @@ export function LabExperience({kind}:{kind:keyof typeof labs}) {
             else if(event.key==='ArrowLeft'||event.key==='ArrowUp')next=(index+lab.services.length-1)%lab.services.length;
             else if(event.key==='Home')next=0;else if(event.key==='End')next=lab.services.length-1;else return;
             event.preventDefault();select(next);buttons.current[next]?.focus();
-          }}><span className="path-number">0{index+1}</span><span>{item.label}</span><ArrowUpRight size={17}/></button>)}
+          }}><span className="path-number">0{index+1}</span><span>{item.label}</span></button>)}
         </div>
       </div>
       <div key={service.id} id={`service-${service.id}`} role="tabpanel" aria-labelledby={`tab-${service.id}`} tabIndex={0} className="service-story">
