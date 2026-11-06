@@ -2,11 +2,12 @@
 
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import gsap from 'gsap';
-import { ArrowRight, ArrowUpRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, Pause, Play } from 'lucide-react';
 import {useRouter} from 'next/navigation';
 import {MenuIcon} from '@/components/navigation/MenuIcon';
 import type {EarthFlight} from '@/components/scene/flight';
 import Link from 'next/link';
+import {contactEmail,discoveryHref,trackConversion,whatsappHref} from '@/lib/contact';
 
 const SpaceScene = lazy(() => import('@/components/scene/SpaceScene'));
 const subscribeHydration = () => () => {};
@@ -146,22 +147,29 @@ export default function Home() {
         <nav id="primary-navigation" aria-label="Main navigation">
           <Link className="home-nav-link" href="/lab" onClick={() => setMenuOpen(false)}>What we do</Link>
           <Link className="home-nav-link" href="/values" onClick={() => setMenuOpen(false)}>Values</Link>
-          <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact <ArrowUpRight size={14} strokeWidth={1.5}/></Link>
+          <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
         </nav>
       </header>
       <main id="main" tabIndex={-1} inert={!ready || !!destination}>
         <div className="hero-copy departure-ui">
           <h1 className="reveal">Beyond Binary &amp; <span>Silicon</span></h1>
-          <p className="eyebrow reveal">IDEAS FOR A MORE HUMAN TOMORROW</p>
-          <button className="hero-explore reveal" onClick={approach}>EXPLORE <ArrowUpRight size={17} strokeWidth={1.5}/></button>
+          <p className="hero-support reveal">We build practical tools and creative content around the work your business needs to do.</p>
+          <div className="hero-actions reveal">
+            <a className="hero-explore hero-contact" href={discoveryHref} target="_blank" rel="noopener noreferrer" onClick={()=>{trackConversion('booking_click','home_hero_whatsapp');trackConversion('whatsapp_click','home_hero');}}>Arrange a free 20-min call</a>
+            <Link className="hero-explore hero-secondary" href="/contact" onClick={()=>trackConversion('cta_click','home_contact')}>Send an enquiry</Link>
+          </div>
+          <button className="hero-discover reveal" onClick={approach}>Explore the studio</button>
+          <p className="brand-tagline reveal">SOFTWARE AND AI FOR YOUR BUSINESS</p>
         </div>
         <div className="journey-end departure-ui" aria-hidden={!approached} inert={!approached}><p>Two worlds.<br/><em>Where will you go?</em></p><div className="home-destinations" aria-label="Choose a destination">{([{id:'software',label:'Software Solutions',detail:'Engineering & AI'},{id:'ads',label:'Media Content Solutions',detail:'Motion, identity & campaigns'}] as const).map(lab=><Link key={lab.id} href={`/lab/${lab.id}`} onClick={event=>{if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();if(!destination)setDestination(lab.id);}}><span>{lab.label}</span><ArrowRight size={16} strokeWidth={1.4}/></Link>)}</div><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon </button></div>
       </main>
       <footer className="footer reveal departure-ui" inert={!ready || !!destination}>
+        <a className="home-email" href={`mailto:${contactEmail}`} onClick={()=>trackConversion('email_click','home_footer')}>{contactEmail}</a>
         <button className="motion-button" onClick={() => setPaused(v => !v)} disabled={reduced} aria-label={reduced ? 'Motion reduced by device preference' : paused ? 'Play scene motion' : 'Pause scene motion'} aria-pressed={paused || reduced}>
           {paused || reduced ? <Play size={13}/> : <Pause size={13}/>}<span>{reduced ? 'REDUCED MOTION' : paused ? 'MOTION PAUSED' : 'PAUSE MOTION'}</span>
         </button>
       </footer>
+      <a className="home-mobile-whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={()=>trackConversion('whatsapp_click','home_mobile_sticky')}>WhatsApp us</a>
       <div className="atmosphere-passage" aria-hidden="true"><div className="passage-cloud"/></div>
       <span className="sr-only" role="status">{destination?`Entering ${destination==='software'?'Software Solutions':'Ad Solutions'}`:''}</span>
       <div className="scroll-track" aria-hidden="true" />

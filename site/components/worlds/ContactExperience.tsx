@@ -4,8 +4,10 @@ import {ArrowUpRight} from 'lucide-react';
 import {WorldShell} from './WorldShell';
 import {labs} from './content';
 import {WorldObject} from './WorldObject';
+import {contactEmail,discoveryHref,trackConversion,whatsappHref} from '@/lib/contact';
 
 const interests=[...labs.software.services,...labs.ads.services].map(service=>service.label);
+interests.push('Free workflow mini-audit','Combined software and content project');
 export function ContactExperience(){
   const interestRef=useRef<HTMLSelectElement>(null);
   const successTitle=useRef<HTMLHeadingElement>(null);
@@ -21,7 +23,12 @@ export function ContactExperience(){
     event.preventDefault();
     if(isSubmitting)return;
     const payload=new URLSearchParams();
-    new FormData(event.currentTarget).forEach((value,key)=>{
+    const formData=new FormData(event.currentTarget);
+    if(!String(formData.get('email')||'').trim()&&!String(formData.get('whatsapp')||'').trim()){
+      setSubmitError('Add an email address or WhatsApp number so we can reply.');
+      return;
+    }
+    formData.forEach((value,key)=>{
       if(typeof value==='string')payload.append(key,value);
     });
     setIsSubmitting(true);
@@ -30,6 +37,7 @@ export function ContactExperience(){
       const response=await fetch(window.location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:payload.toString()});
       if(!response.ok)throw new Error('Form submission failed.');
       setSubmitted(true);
+      trackConversion('form_submit','contact_enquiry');
     }catch{
       setSubmitError('We couldn’t send your enquiry. Please try again.');
     }finally{
@@ -38,13 +46,13 @@ export function ContactExperience(){
   }
   return <WorldShell image="@contact.webp" label="Start a conversation">
     <div className="contact-layout">
-      <div className="contact-intro"><p className="world-kicker">CONTACT / EVERY IDEA STARTS SOMEWHERE</p><h1>Something on <em>your horizon?</em></h1><p>A half-formed idea, a business challenge, or a story waiting to be told. We’d love to hear it.</p></div>
+      <div className="contact-intro"><p className="world-kicker">CONTACT / EVERY IDEA STARTS SOMEWHERE</p><h1>Something on <em>your horizon?</em></h1><p>A business challenge, a task you’d like to automate, or a product idea. Tell us what you’re working through and we’ll get back to you.</p><div className="contact-quick-links"><a href={discoveryHref} target="_blank" rel="noopener noreferrer" onClick={()=>{trackConversion('booking_click','contact_page_whatsapp');trackConversion('whatsapp_click','contact_page');}}>Arrange a free 20-min call</a><a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={()=>trackConversion('whatsapp_click','contact_page')}>WhatsApp</a><a href={`mailto:${contactEmail}`} onClick={()=>trackConversion('email_click','contact_page')}>{contactEmail}</a></div></div>
       <section className="contact-panel" aria-label="Project enquiry">
         {!submitted&&<form name="contact" method="POST" data-netlify="true" onSubmit={sendEnquiry}>
           <input type="hidden" name="form-name" value="contact" />
           <p className="world-kicker">TELL US WHAT YOU’RE THINKING</p>
-          <div className="contact-fields"><label>Your name<input name="name" autoComplete="name" required maxLength={100} /></label><label>Email address<input name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com"/></label></div>
-          <label>What would you like to create?<select ref={interestRef} name="interest" required defaultValue=""><option value="" disabled>Choose a starting point</option><optgroup label="Software & AI Solutions">{labs.software.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><optgroup label="Media Content Creation">{labs.ads.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><option>Something else / Let’s explore</option></select></label>
+          <div className="contact-fields"><label>Your name<input name="name" autoComplete="name" required maxLength={100} /></label><label>Email address <span className="field-hint">or WhatsApp number</span><input name="email" type="email" autoComplete="email" maxLength={254} placeholder="you@example.com"/><input name="whatsapp" type="tel" autoComplete="tel" maxLength={32} placeholder="WhatsApp number" aria-label="WhatsApp number"/></label></div>
+          <label>What would you like to create?<select ref={interestRef} name="interest" required defaultValue=""><option value="" disabled>Choose a starting point</option><optgroup label="Software & AI Solutions">{labs.software.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><optgroup label="Media Content Creation">{labs.ads.services.map(service=><option key={service.id}>{service.label}</option>)}</optgroup><option>Free workflow mini-audit</option><option>Combined software and content project</option><option>Something else / Let’s explore</option></select></label>
           <label>A little about your idea<textarea name="message" required minLength={10} maxLength={5000} rows={4} placeholder="What are you hoping to build, change, or create?"/></label>
           <button type="submit" className="world-action" disabled={isSubmitting}>{isSubmitting?'Sending enquiry…':'Send enquiry'} </button>
           {submitError&&<p className="contact-notice" role="alert">{submitError}</p>}

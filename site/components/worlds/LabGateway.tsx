@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {ArrowUpRight} from 'lucide-react';
 import {WorldShell} from './WorldShell';
+import {ConversionSections} from './ConversionSections';
 
 export function LabGateway(){
   return <WorldShell image="@kepler.webp" label="What we do">
@@ -10,5 +11,6 @@ export function LabGateway(){
       <Link className="lab-portal" href="/lab/software"><Image src="/assets/worlds/softwarelab.webp" fill sizes="(max-width:700px) 100vw, 50vw" alt="Green highlands, white clouds, and a winding river" unoptimized/><span className="portal-shade"/><span className="portal-top">01 / ENGINEERING </span><span className="portal-bottom"><strong>Software &<br/>AI Solutions</strong><span>Models · Workflows · Products · MVPs</span><span className="portal-enter">Enter the landscape </span></span></Link>
       <Link className="lab-portal" href="/lab/ads"><Image src="/assets/worlds/adlab.webp" fill sizes="(max-width:700px) 100vw, 50vw" alt="Sunlit sandstone beside reflective water beneath white clouds" unoptimized/><span className="portal-shade"/><span className="portal-top">02 / CREATIVE </span><span className="portal-bottom"><strong>Media Content<br/>Creation</strong><span>Animation · Brand identity · Advertising</span><span className="portal-enter">Enter the landscape </span></span></Link>
     </div>
+    <ConversionSections/>
   </WorldShell>;
 }

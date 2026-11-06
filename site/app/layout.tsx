@@ -6,11 +6,11 @@ import {siteUrl} from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: "Afterlife Theory Labs — Beyond Binary & Silicon",
-  description: "A human-centered design and engineering studio building AI-enabled software and media for a more human tomorrow.",
+  description: "Afterlife Theory Labs builds practical software, business-specific AI solutions, and creative media that help businesses work better.",
   metadataBase:new URL(siteUrl),
   alternates:{canonical:'/'},
-  openGraph:{type:'website',siteName:'Afterlife Theory Labs',title:'Afterlife Theory Labs — Beyond Binary & Silicon',description:'Software engineering, AI solutions, and creative media from Afterlife Theory Labs.',url:'/',locale:'en_IN'},
-  twitter:{card:'summary',title:'Afterlife Theory Labs — Beyond Binary & Silicon',description:'Software engineering, AI solutions, and creative media.'},
+  openGraph:{type:'website',siteName:'Afterlife Theory Labs',title:'Afterlife Theory Labs — Software, AI & Creative Media',description:'Practical software, business-specific AI solutions, and creative media for the way your business works.',url:'/',locale:'en_IN'},
+  twitter:{card:'summary',title:'Afterlife Theory Labs — Software, AI & Creative Media',description:'Practical software, business-specific AI solutions, and creative media for the way your business works.'},
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

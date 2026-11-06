@@ -7,6 +7,7 @@ import {WorldShell} from './WorldShell';
 import {labs} from './content';
 import {ProjectGallery} from '../projects/ProjectGallery';
 import {WorldObject} from './WorldObject';
+import {trackConversion} from '@/lib/contact';
 
 export function LabExperience({kind}:{kind:keyof typeof labs}) {
   const lab=labs[kind];
@@ -46,7 +47,7 @@ export function LabExperience({kind}:{kind:keyof typeof labs}) {
         <ol className={`service-process process-${kind}`} aria-label="Our approach">{service.steps.map((step,index)=><li key={step}><span className="process-point">{kind==='ads'?['◯','◇','✳'][index]:`0${index+1}`}</span><span>{step}</span></li>)}</ol>
         <p className="service-outcome">{service.outcome}</p>
         {kind==='software'&&<ProjectGallery service={service.id} compact/>}
-        <Link className="world-action" href={`/contact?interest=${encodeURIComponent(service.label)}`}>Let’s build this together <ArrowUpRight size={18}/></Link>
+        <Link className="world-action" href={`/contact?interest=${encodeURIComponent(service.label)}`} onClick={()=>trackConversion('cta_click',`get_this_${service.id}`)}>Get this <ArrowUpRight size={18}/></Link>
       </div>
     </section>
     <Link className="world-switch" href={kind==='software'?'/lab/ads':'/lab/software'}>Explore {kind==='software'?'Media Creation':'Software & AI Solutions'} <ArrowRight size={16}/></Link>
