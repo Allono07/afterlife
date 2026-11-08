@@ -48,7 +48,7 @@ export function WorldShell({children,image='softwarelab',label,position='50%'}:{
       </nav>
     </header>
     <main id="destination" className="world-content" tabIndex={-1}>{children}</main>
-    <footer className="world-footer"><span>AFTERLIFE THEORY LABS</span><a href="mailto:allono.at@gmail.com" onClick={()=>trackConversion('email_click','world_footer')}>allono.at@gmail.com</a><span>{label} / BEYOND BINARY & SILICON</span></footer>
+    <footer className="world-footer"><span>AFTERLIFE THEORY LABS</span><a href="mailto:allono.at@gmail.com" onClick={()=>trackConversion('email_click','world_footer')}></a><span>{label} / BEYOND BINARY & SILICON</span></footer>
     <a className="mobile-whatsapp-cta" href={discoveryHref} target="_blank" rel="noopener noreferrer" onClick={()=>{trackConversion('booking_click','mobile_sticky_whatsapp');trackConversion('whatsapp_click','mobile_sticky');}}><span>Arrange a free 20-min call</span></a>
   </div>;
 }
