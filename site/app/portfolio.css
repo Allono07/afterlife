@@ -176,8 +176,8 @@
   .experience .hero-copy{top:9.5%;}
   .hero-support{max-width:40ch;margin:9px auto 12px;padding:6px 10px;font-size:11px;line-height:1.45;letter-spacing:-.025em;}
   .experience .hero-actions .hero-explore{min-height:42px;padding:10px 13px;font-size:9px;}
-  .hero-discover{margin-top:11px;font-size:8px;}
-  .brand-tagline{max-width:34ch;margin:12px auto 0;padding:5px 8px;font-size:7px;line-height:1.7;letter-spacing:.14em;}
+  .hero-discover{display:none;}
+  .brand-tagline{max-width:none;white-space:nowrap;margin:12px auto 0;padding:5px 8px;font-size:7px;line-height:1.7;letter-spacing:.14em;}
   .home-mobile-whatsapp,.mobile-whatsapp-cta{position:fixed;z-index:30;left:15px;right:15px;bottom:max(13px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:0 16px;background:#e8eae4;color:#14231b;border:1px solid #ffffffcc;font-size:11px;font-weight:650;letter-spacing:.03em;box-shadow:0 7px 24px #0004;}
   .experience .home-mobile-whatsapp{z-index:15;}
   .world .world-nav .world-whatsapp-link{display:flex;border:0;border-bottom:1px solid var(--line);padding:13px 0;}
