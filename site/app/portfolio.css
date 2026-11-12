@@ -174,7 +174,7 @@
 @media(max-width:700px){
   .experience .hero-actions{gap:8px;flex-wrap:wrap;}
   .experience .hero-copy{top:9.5%;}
-  .hero-support{max-width:34ch;margin:9px auto 12px;padding:6px 10px;font-size:11px;line-height:1.45;letter-spacing:-.025em;}
+  .hero-support{max-width:40ch;margin:9px auto 12px;padding:6px 10px;font-size:11px;line-height:1.45;letter-spacing:-.025em;}
   .experience .hero-actions .hero-explore{min-height:42px;padding:10px 13px;font-size:9px;}
   .hero-discover{margin-top:11px;font-size:8px;}
   .brand-tagline{max-width:34ch;margin:12px auto 0;padding:5px 8px;font-size:7px;line-height:1.7;letter-spacing:.14em;}

@@ -164,7 +164,7 @@ export default function Home() {
         <div className="journey-end departure-ui" aria-hidden={!approached} inert={!approached}><p>Two worlds.<br/><em>Where will you go?</em></p><div className="home-destinations" aria-label="Choose a destination">{([{id:'software',label:'Software Solutions',detail:'Engineering & AI'},{id:'ads',label:'Media Content Solutions',detail:'Motion, identity & campaigns'}] as const).map(lab=><Link key={lab.id} href={`/lab/${lab.id}`} onClick={event=>{if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();if(!destination)setDestination(lab.id);}}><span>{lab.label}</span><ArrowRight size={16} strokeWidth={1.4}/></Link>)}</div><button onClick={() => window.scrollTo({top:0, behavior: reduced ? 'instant' : 'smooth'})}>Return to the horizon </button></div>
       </main>
       <footer className="footer reveal departure-ui" inert={!ready || !!destination}>
-        <a className="home-email" href={`mailto:${contactEmail}`} onClick={()=>trackConversion('email_click','home_footer')}>{contactEmail}</a>
+        {/* <a className="home-email" href={`mailto:${contactEmail}`} onClick={()=>trackConversion('email_click','home_footer')}>{contactEmail}</a> */}
         <button className="motion-button" onClick={() => setPaused(v => !v)} disabled={reduced} aria-label={reduced ? 'Motion reduced by device preference' : paused ? 'Play scene motion' : 'Pause scene motion'} aria-pressed={paused || reduced}>
           {paused || reduced ? <Play size={13}/> : <Pause size={13}/>}<span>{reduced ? 'REDUCED MOTION' : paused ? 'MOTION PAUSED' : 'PAUSE MOTION'}</span>
         </button>
